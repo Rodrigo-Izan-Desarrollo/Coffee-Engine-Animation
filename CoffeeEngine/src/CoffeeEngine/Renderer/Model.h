@@ -25,10 +25,16 @@ namespace Coffee {
      * @brief Renderer components of the CoffeeEngine.
      * @{
      */
-
+    struct BoneInfo
+    {
+        int id;
+        glm::mat4 offset;               
+    };
     /**
      * @brief Class representing a 3D model.
      */
+
+
     class Model : public Resource, public std::enable_shared_from_this<Model>
     {
     public:
@@ -112,6 +118,14 @@ namespace Coffee {
          * @return The loaded material textures.
          */
         MaterialTextures LoadMaterialTextures(aiMaterial* material);
+
+        auto& GetBoneInfoMap() { return m_BoneInfoMap; }
+        
+        int& GetBoneCount() { return m_BoneCounter; } 
+
+        void ExtractBoneWeightForVertices(std::vector <Vertex>& vertices, aiMesh* mesh, const aiScene* scene);
+
+        void SetVertexBoneData(Vertex& vertex, int boneID, float weight);
         
         friend class cereal::access;
         template<class Archive>
@@ -136,6 +150,8 @@ namespace Coffee {
             }
         }
 
+
+
     private:
         std::vector<Ref<Mesh>> m_Meshes; ///< The meshes of the model.
 
@@ -145,7 +161,14 @@ namespace Coffee {
         glm::mat4 m_Transform; ///< The transformation matrix of the model.
 
         std::string m_NodeName; ///< The name of the node.
+
+        std::map<std::string, BoneInfo> m_BoneInfoMap;
+        int m_BoneCounter = 0;
     };
+
+
+
+
 
     /** @} */
 }

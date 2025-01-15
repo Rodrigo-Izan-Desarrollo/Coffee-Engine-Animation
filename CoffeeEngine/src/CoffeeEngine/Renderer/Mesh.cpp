@@ -21,7 +21,15 @@ namespace Coffee {
             {ShaderDataType::Vec2, "a_TexCoords"},
             {ShaderDataType::Vec3, "a_Normals"},
             {ShaderDataType::Vec3, "a_Tangent"},
-            {ShaderDataType::Vec3, "a_Bitangent"}
+            {ShaderDataType::Vec3, "a_Bitangent"},
+            {ShaderDataType::Int, "a_BoneId"},
+            {ShaderDataType::Int, "a_BoneId"},
+            {ShaderDataType::Int, "a_BoneId"},
+            {ShaderDataType::Int, "a_BoneId"},
+            {ShaderDataType::Float, "a_BoneWeight"},
+            {ShaderDataType::Float, "a_BoneWeight"},
+            {ShaderDataType::Float, "a_BoneWeight"},
+            {ShaderDataType::Float, "a_BoneWeight"}
         };
 
         m_VertexBuffer->SetLayout(layout);

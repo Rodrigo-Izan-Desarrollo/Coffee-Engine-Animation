@@ -122,9 +122,13 @@ namespace Coffee {
                 indices.push_back(face.mIndices[j]);
         }
 
+        ExtractBoneWeightForVertices(vertices,mesh,scene);
+
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
         Ref<Material> meshMaterial;
+
+
 
         //The next code is rushed, please Hugo of the future refactor this ;_;
         if(material)
@@ -155,6 +159,19 @@ namespace Coffee {
         return resultMesh;
     }
 
+    void Model::SetVertexBoneData(Vertex& vertex, int boneID, float weight)
+    {
+        for (int i = 0; i < 4; ++i)
+        {
+            if (vertex.m_BoneIDs[i] < 0)
+            {
+                vertex.m_Weights[i] = weight;
+                vertex.m_BoneIDs[i] = boneID;
+                break;
+            }
+        }
+    }
+
     // processes a node in a recursive fashion. Processes each individual mesh located at the node and repeats this process on its children nodes (if any).
     void Model::processNode(aiNode* node, const aiScene* scene)
     {
@@ -179,6 +196,40 @@ namespace Coffee {
             m_Children.push_back(child);
 
             child->processNode(node->mChildren[i], scene);
+        }
+    }
+
+    void Model::ExtractBoneWeightForVertices(std::vector <Vertex>& vertices, aiMesh* mesh, const aiScene* scene)
+    {
+        for (int boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex)
+        {
+            int boneID = -1;
+            std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
+            if (m_BoneInfoMap.find(boneName) == m_BoneInfoMap.end())
+            {
+                BoneInfo newBoneInfo;
+                newBoneInfo.id = m_BoneCounter;
+                newBoneInfo.offset = aiMatrix4x4ToGLMMat4(
+                    mesh->mBones[boneIndex]->mOffsetMatrix);
+                m_BoneInfoMap[boneName] = newBoneInfo;
+                boneID = m_BoneCounter;
+                m_BoneCounter++;
+            }
+            else
+            {
+                boneID = m_BoneInfoMap[boneName].id;
+            }
+            assert(boneID != -1);
+            auto weights = mesh->mBones[boneIndex]->mWeights;
+            int numWeights = mesh->mBones[boneIndex]->mNumWeights;
+
+            for (int weightIndex = 0; weightIndex < numWeights; ++weightIndex)
+            {
+                int vertexId = weights[weightIndex].mVertexId;
+                float weight = weights[weightIndex].mWeight;
+                assert(vertexId <= vertices.size());
+                SetVertexBoneData(vertices[vertexId], boneID, weight);
+            }
         }
     }
 

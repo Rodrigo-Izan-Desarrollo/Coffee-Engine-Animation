@@ -36,6 +36,8 @@ namespace Coffee {
         glm::vec3 Normals = glm::vec3(0.0f); ///< The normal vector of the vertex.
         glm::vec3 Tangent = glm::vec3(0.0f); ///< The tangent vector of the vertex.
         glm::vec3 Bitangent = glm::vec3(0.0f); ///< The bitangent vector of the vertex.
+        int m_BoneIDs[4] = {-1, -1, -1, -1};
+        float m_Weights[4]= {0.0, 0.0,0.0 ,0.0 };
 
         private:
             friend class cereal::access;
