@@ -3,6 +3,7 @@
 #include "CoffeeEngine/Core/DataStructures/Octree.h"
 #include "CoffeeEngine/Events/Event.h"
 #include "CoffeeEngine/Renderer/EditorCamera.h"
+#include <CoffeeEngine/Animation/Animator.h>
 #include "CoffeeEngine/Scene/SceneTree.h"
 #include "entt/entity/fwd.hpp"
 
@@ -115,6 +116,8 @@ namespace Coffee {
         friend class Entity;
         friend class SceneTree;
         friend class SceneTreePanel;
+
+        Animator animator;
 
         //REMOVE PLEASE, THIS IS ONLY TO TEST THE OCTREE!!!!
         friend class EditorLayer;
