@@ -18,6 +18,8 @@
 #include <string>
 #include <vector>
 
+#define MAX_BONE_INFLUENCE 4
+
 namespace Coffee {
 
     /**
@@ -29,6 +31,7 @@ namespace Coffee {
     {
         int id;
         glm::mat4 offset;               
+
     };
     /**
      * @brief Class representing a 3D model.
@@ -122,10 +125,6 @@ namespace Coffee {
         auto& GetBoneInfoMap() { return m_BoneInfoMap; }
         
         int& GetBoneCount() { return m_BoneCounter; } 
-
-        void ExtractBoneWeightForVertices(std::vector <Vertex>& vertices, aiMesh* mesh, const aiScene* scene);
-
-        void SetVertexBoneData(Vertex& vertex, int boneID, float weight);
         
         friend class cereal::access;
         template<class Archive>
@@ -162,8 +161,11 @@ namespace Coffee {
 
         std::string m_NodeName; ///< The name of the node.
 
-        std::map<std::string, BoneInfo> m_BoneInfoMap;
+         std::map<std::string, BoneInfo> m_BoneInfoMap;
         int m_BoneCounter = 0;
+
+        void SetVertexBoneData(Vertex& vertex, int boneID, float weight);
+        void ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh* mesh, const aiScene* scene);
     };
 
 

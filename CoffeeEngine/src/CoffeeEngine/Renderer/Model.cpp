@@ -74,7 +74,7 @@ namespace Coffee {
             vector.y = mesh->mVertices[i].y;
             vector.z = mesh->mVertices[i].z;
 
-            vertex.Position = vector;
+             vertex.Position = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
 
             //normals
             if(mesh->HasNormals())
@@ -112,6 +112,12 @@ namespace Coffee {
                 vertex.TexCoords = glm::vec2(0.0f, 0.0f);
             }
             vertices.push_back(vertex);
+
+            for (int j = 0; j < MAX_BONE_INFLUENCE; j++)
+            {
+                vertex.m_BoneIDs[j] = -1;
+                vertex.m_Weights[j] = 0.0f;
+            }
         }
         // now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
 
@@ -159,9 +165,45 @@ namespace Coffee {
         return resultMesh;
     }
 
+    void Model::ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh* mesh, const aiScene* scene)
+    {
+        for (int boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex)
+        {
+            int boneID = -1;
+            std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
+            
+            // Create or find bone in BoneInfoMap
+            if (m_BoneInfoMap.find(boneName) == m_BoneInfoMap.end())
+            {
+                BoneInfo newBoneInfo;
+                newBoneInfo.id = m_BoneCounter;
+                newBoneInfo.offset = aiMatrix4x4ToGLMMat4(
+                    mesh->mBones[boneIndex]->mOffsetMatrix);
+                m_BoneInfoMap[boneName] = newBoneInfo;
+                boneID = m_BoneCounter;
+                m_BoneCounter++;
+            }
+            else
+            {
+                boneID = m_BoneInfoMap[boneName].id;
+            }
+
+            // Extract weights for this bone
+            auto weights = mesh->mBones[boneIndex]->mWeights;
+            int numWeights = mesh->mBones[boneIndex]->mNumWeights;
+
+            for (int weightIndex = 0; weightIndex < numWeights; ++weightIndex)
+            {
+                int vertexId = weights[weightIndex].mVertexId;
+                float weight = weights[weightIndex].mWeight;
+                SetVertexBoneData(vertices[vertexId], boneID, weight);
+            }
+        }
+    }
+
     void Model::SetVertexBoneData(Vertex& vertex, int boneID, float weight)
     {
-        for (int i = 0; i < 4; ++i)
+        for (int i = 0; i < MAX_BONE_INFLUENCE; ++i)
         {
             if (vertex.m_BoneIDs[i] < 0)
             {
@@ -171,6 +213,7 @@ namespace Coffee {
             }
         }
     }
+
 
     // processes a node in a recursive fashion. Processes each individual mesh located at the node and repeats this process on its children nodes (if any).
     void Model::processNode(aiNode* node, const aiScene* scene)
@@ -196,40 +239,6 @@ namespace Coffee {
             m_Children.push_back(child);
 
             child->processNode(node->mChildren[i], scene);
-        }
-    }
-
-    void Model::ExtractBoneWeightForVertices(std::vector <Vertex>& vertices, aiMesh* mesh, const aiScene* scene)
-    {
-        for (int boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex)
-        {
-            int boneID = -1;
-            std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
-            if (m_BoneInfoMap.find(boneName) == m_BoneInfoMap.end())
-            {
-                BoneInfo newBoneInfo;
-                newBoneInfo.id = m_BoneCounter;
-                newBoneInfo.offset = aiMatrix4x4ToGLMMat4(
-                    mesh->mBones[boneIndex]->mOffsetMatrix);
-                m_BoneInfoMap[boneName] = newBoneInfo;
-                boneID = m_BoneCounter;
-                m_BoneCounter++;
-            }
-            else
-            {
-                boneID = m_BoneInfoMap[boneName].id;
-            }
-            assert(boneID != -1);
-            auto weights = mesh->mBones[boneIndex]->mWeights;
-            int numWeights = mesh->mBones[boneIndex]->mNumWeights;
-
-            for (int weightIndex = 0; weightIndex < numWeights; ++weightIndex)
-            {
-                int vertexId = weights[weightIndex].mVertexId;
-                float weight = weights[weightIndex].mWeight;
-                assert(vertexId <= vertices.size());
-                SetVertexBoneData(vertices[vertexId], boneID, weight);
-            }
         }
     }
 
