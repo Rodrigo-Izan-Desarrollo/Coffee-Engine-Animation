@@ -18,7 +18,6 @@
 #include "entt/entity/entity.hpp"
 #include "entt/entity/fwd.hpp"
 #include "entt/entity/snapshot.hpp"
-#include "CoffeeEngine/Embedded/StandardShader.hpp"
 
 #include <cstdint>
 #include <cstdlib>
@@ -120,14 +119,9 @@ namespace Coffee {
 
         Renderer::BeginScene(camera);
 
-        float currentFrame = glfwGetTime();
-        dt = currentFrame - lastFrame;
-        lastFrame = currentFrame;
-
 
         // TEST ------------------------------
         m_Octree.DebugDraw();
-        animator.UpdateAnimation(dt);
 
         // Get all entities with ModelComponent and TransformComponent
         auto view = m_Registry.view<MeshComponent, TransformComponent>();
@@ -146,10 +140,6 @@ namespace Coffee {
             //Renderer::Submit(material, mesh, transformComponent.GetWorldTransform(), (uint32_t)entity);
             Renderer::Submit(RenderCommand{transformComponent.GetWorldTransform(), mesh, material, (uint32_t)entity});
         }
-
-         auto transforms = animator.GetFinalBoneMatrices();
-         for (int i = 0; i < transforms.size(); ++i)
-         StandardShader.setMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
 
         //Get all entities with LightComponent and TransformComponent
         auto lightView = m_Registry.view<LightComponent, TransformComponent>();
