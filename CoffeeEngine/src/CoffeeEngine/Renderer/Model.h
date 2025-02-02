@@ -17,7 +17,8 @@
 #include <memory>
 #include <string>
 #include <vector>
-
+#include <CoffeeEngine/Animation/Animation.h>
+#define GLM_ENABLE_EXPERIMENTAL
 #define MAX_BONE_INFLUENCE 4
 
 namespace Coffee {
@@ -122,7 +123,24 @@ namespace Coffee {
          */
         MaterialTextures LoadMaterialTextures(aiMaterial* material);
 
-        auto& GetBoneInfoMap() { return m_BoneInfoMap; }
+        /**
+         * @brief Loads an animation from file and associates it with this model.
+         * @param animationPath Path to the animation file
+         * @return The loaded animation
+         */
+        Ref<Animation> LoadAnimation(const std::filesystem::path& animationPath);
+
+        /**
+         * @brief Gets the bone information map.
+         * @return Reference to the bone info map
+         */
+        std::map<std::string, BoneInfo>& GetBoneInfoMap() { return m_BoneInfoMap; }
+    
+        /**
+         * @brief Gets the bone counter.
+         * @return Reference to the bone counter
+         */
+        int& GetBoneCount() { return m_BoneCounter; }
         
         int& GetBoneCount() { return m_BoneCounter; } 
         
@@ -166,6 +184,9 @@ namespace Coffee {
 
         void SetVertexBoneData(Vertex& vertex, int boneID, float weight);
         void ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh* mesh, const aiScene* scene);
+
+         void ReadAnimationBones(const aiAnimation* animation, std::vector<Bone>& bones, std::map<std::string, BoneInfo>& boneInfoMap);
+        void ReadNodeHierarchy(AssimpNodeData& dest, const aiNode* src);
     };
 
 

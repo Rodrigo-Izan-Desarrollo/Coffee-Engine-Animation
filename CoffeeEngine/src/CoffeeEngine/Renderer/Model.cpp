@@ -17,6 +17,7 @@
 #include <string>
 #include <tracy/Tracy.hpp>
 #include <vector>
+#define GLM_ENABLE_EXPERIMENTAL
 
 
 namespace Coffee {
@@ -275,6 +276,68 @@ namespace Coffee {
         matTextures.emissive = LoadTexture2D(material, aiTextureType_EMISSIVE);
 
         return matTextures;
+    }
+
+    Ref<Animation> Model::LoadAnimation(const std::filesystem::path& animationPath)
+    {
+        ZoneScoped;
+
+        Assimp::Importer importer;
+        const aiScene* scene = importer.ReadFile(animationPath.string(), aiProcess_Triangulate);
+    
+        if (!scene || !scene->mRootNode || scene->mNumAnimations == 0)
+        {
+            COFFEE_CORE_ERROR("ERROR::ASSIMP:: Failed to load animation: {0}", importer.GetErrorString());
+            return nullptr;
+        }
+
+        Ref<Animation> animation = CreateRef<Animation>();
+        const aiAnimation* aiAnim = scene->mAnimations[0];
+    
+        // Set basic animation properties
+        animation->m_Duration = aiAnim->mDuration;
+        animation->m_TicksPerSecond = aiAnim->mTicksPerSecond;
+    
+        // Read node hierarchy
+        ReadNodeHierarchy(animation->m_RootNode, scene->mRootNode);
+    
+        // Read bones
+        ReadAnimationBones(aiAnim, animation->m_Bones, animation->m_BoneInfoMap);
+
+        return animation;
+    }
+
+    void Model::ReadAnimationBones(const aiAnimation* animation, std::vector<Bone>& bones, std::map<std::string, BoneInfo>& boneInfoMap)
+    {
+        for (uint32_t i = 0; i < animation->mNumChannels; i++)
+        {
+            auto channel = animation->mChannels[i];
+            std::string boneName = channel->mNodeName.data;
+        
+            if (m_BoneInfoMap.find(boneName) == m_BoneInfoMap.end())
+            {
+                m_BoneInfoMap[boneName].id = m_BoneCounter;
+                m_BoneCounter++;
+            }
+        
+            bones.push_back(Bone(channel->mNodeName.data, m_BoneInfoMap[boneName].id, channel));
+        }
+    
+        boneInfoMap = m_BoneInfoMap;
+    }
+
+    void Model::ReadNodeHierarchy(AssimpNodeData& dest, const aiNode* src)
+    {
+        dest.name = src->mName.data;
+        dest.transformation = aiMatrix4x4ToGLMMat4(src->mTransformation);
+        dest.childrenCount = src->mNumChildren;
+    
+        for (uint32_t i = 0; i < src->mNumChildren; i++)
+        {
+            AssimpNodeData newData;
+            ReadNodeHierarchy(newData, src->mChildren[i]);
+            dest.children.push_back(newData);
+        }
     }
 
 }
