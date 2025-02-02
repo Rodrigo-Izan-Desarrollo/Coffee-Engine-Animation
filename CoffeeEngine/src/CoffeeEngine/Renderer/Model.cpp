@@ -1,3 +1,4 @@
+#define GLM_ENABLE_EXPERIMENTAL
 #include "CoffeeEngine/Renderer/Model.h"
 #include "CoffeeEngine/Core/Base.h"
 #include "CoffeeEngine/Core/Log.h"
@@ -17,7 +18,7 @@
 #include <string>
 #include <tracy/Tracy.hpp>
 #include <vector>
-#define GLM_ENABLE_EXPERIMENTAL
+
 
 
 namespace Coffee {
@@ -340,4 +341,5 @@ namespace Coffee {
         }
     }
 
-}
+} // namespace Coffee
+#undef GLM_ENABLE_EXPERIMENTAL

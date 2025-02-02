@@ -1,4 +1,5 @@
 #pragma once
+#define GLM_ENABLE_EXPERIMENTAL
 
 #include "CoffeeEngine/Core/Base.h"
 #include "CoffeeEngine/Renderer/Material.h"
@@ -18,7 +19,7 @@
 #include <string>
 #include <vector>
 #include <CoffeeEngine/Animation/Animation.h>
-#define GLM_ENABLE_EXPERIMENTAL
+
 #define MAX_BONE_INFLUENCE 4
 
 namespace Coffee {
@@ -142,7 +143,6 @@ namespace Coffee {
          */
         int& GetBoneCount() { return m_BoneCounter; }
         
-        int& GetBoneCount() { return m_BoneCounter; } 
         
         friend class cereal::access;
         template<class Archive>

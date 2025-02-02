@@ -1,12 +1,13 @@
 #pragma once
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/matrix_interpolation.hpp>
 #include <assimp/scene.h>
 #include <string>
 #include <vector>
-#define GLM_ENABLE_EXPERIMENTAL
+
 
 namespace Coffee {
     class Bone {

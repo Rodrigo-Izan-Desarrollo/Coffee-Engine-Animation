@@ -1,4 +1,5 @@
 #pragma once
+#define GLM_ENABLE_EXPERIMENTAL
 #include "CoffeeEngine/Core/Base.h"
 #include "CoffeeEngine/IO/ResourceLoader.h"
 #include "CoffeeEngine/IO/Serialization/GLMSerialization.h"
@@ -18,7 +19,7 @@
 
 #include"CoffeeEngine/Renderer/Model.h"
 #include "CoffeeEngine/Animation/Bone.h"
-#define GLM_ENABLE_EXPERIMENTAL
+
 
 namespace Coffee {
      struct BoneInfo;

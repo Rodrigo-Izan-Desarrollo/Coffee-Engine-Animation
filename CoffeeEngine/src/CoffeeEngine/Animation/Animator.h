@@ -1,4 +1,5 @@
 #pragma once
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
@@ -7,7 +8,7 @@
 #include <cmath>
 #include "CoffeeEngine/Animation/Animation.h"
 #include "CoffeeEngine/Animation/Bone.h"
-#define GLM_ENABLE_EXPERIMENTAL
+
 
 namespace Coffee {
 
